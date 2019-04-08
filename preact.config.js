@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import delve from 'dlv';
 import CopyPlugin from 'copy-webpack-plugin';
 import Critters from 'critters-webpack-plugin';
+import FixStyleOnlyEntriesPlugin from 'webpack-fix-style-only-entries';
 import yaml from 'yaml';
 import netlifyPlugin from 'preact-cli-plugin-netlify';
 
@@ -31,6 +32,8 @@ export default function (config, env, helpers) {
 		const opts = delve(loader, 'use.0.options.options');
 		if (opts && opts.paths) delete opts.paths;
 	});
+
+	config.plugins.unshift(new FixStyleOnlyEntriesPlugin());
 
 	const critters = helpers.getPluginsByName(config, 'Critters')[0];
 	if (critters) {
