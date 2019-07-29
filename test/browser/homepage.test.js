@@ -47,6 +47,35 @@ describe('Homepage', () => {
 	beforeAll(async () => {
 		await page.setCacheEnabled(false);
 		page._client.send('Network.setBypassServiceWorker', { bypass: true });
+
+		// avoid external deps on the Github API
+		await page.setRequestInterception(true);
+		page.on('request', req => {
+			if (
+				req
+					.url()
+					.match(/api\.github\.com\/repos\/preactjs\/preact\/releases\/latest/)
+			) {
+				req.respond({
+					status: 200,
+					contentType: 'application/json',
+					body: JSON.stringify({
+						version: 'v10.0.0-rc.0',
+						url: 'https://github.com/preactjs/preact'
+					})
+				});
+			} else if (req.url().match(/api\.github\.com\/repos\/preactjs\/preact/)) {
+				req.respond({
+					status: 200,
+					contentType: 'application/json',
+					body: JSON.stringify({
+						stargazers_count: 23300
+					})
+				});
+			} else {
+				req.continue();
+			}
+		});
 	});
 
 	it('should display "Preact" text on page', async () => {
