@@ -8,6 +8,12 @@ import customProperties from 'postcss-custom-properties';
 // prettier-ignore
 
 export default function (config, env, helpers) {
+
+	if (process.env.PROFILE) {
+		const ProfilingPlugin = require('webpack/lib/debug/ProfilingPlugin');
+		config.plugins.unshift(new ProfilingPlugin({}));
+	}
+
 	// aliases from before the beginning of time
 	Object.assign(config.resolve.alias, {
 		src: resolve(__dirname, 'src'),
